@@ -149,6 +149,19 @@ action_state_t idaapi show_context_menu_name_ah_t::update(action_update_ctx_t *)
 	return AST_ENABLE_ALWAYS;
 }
 
+int idaapi context_menu_disas_sync_ah_t::activate(action_activation_ctx_t* ctx)
+{
+	if (ctx->cur_ea == BADADDR) return 0;
+
+	myView->OnNavigateTag(ctx->cur_ea);
+	return 0;
+}
+
+action_state_t idaapi context_menu_disas_sync_ah_t::update(action_update_ctx_t*)
+{
+	return AST_ENABLE_ALWAYS;
+}
+
 Idatag_hook_ui::Idatag_hook_ui()
 {
 	hook_to_notification_point(HT_UI, &ui_evt_h, this);
@@ -171,6 +184,17 @@ Idatag_hook_ui::Idatag_hook_ui()
 		NULL,
 		NULL, -1);
 	if (!register_action(desc_disas_menu_func))
+	{
+		msg("\n[IDATag] Failed to register contextual menu in IDA");
+	}
+
+	this->desc_disas_menu_sync = ACTION_DESC_LITERAL(
+		"idatag:context_menu_disas_sync",
+		"[IDATag] ~S~ynchronise",
+		&context_menu_disas_sync_ah,
+		NULL,
+		NULL, -1);
+	if (!register_action(desc_disas_menu_sync))
 	{
 		msg("\n[IDATag] Failed to register contextual menu in IDA");
 	}

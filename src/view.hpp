@@ -114,6 +114,7 @@ public:
 	void OnFilter_feeder_pass();
 
 	void OnNavigate(const QModelIndex&);
+	void OnNavigateTag(const uint64_t rva);
 	void OnSearch();
 
 	void customMenuRequested(QPoint pos);

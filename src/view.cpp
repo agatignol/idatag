@@ -321,6 +321,15 @@ void Idatag_view::OnNavigate(const QModelIndex& index)
 	}
 }
 
+void Idatag_view::OnNavigateTag(const uint64_t rva)
+{
+	QItemSelectionModel::SelectionFlags flags = QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows;
+	QModelIndex index = myModel->get_index_byrva(rva);
+	this->tb->setCurrentIndex(index);
+	this->tb->setFocus();
+	this->selectionModel->select(index, flags);
+}
+
 void Idatag_view::OnSearch()
 {
 	this->tf->setFocus();
