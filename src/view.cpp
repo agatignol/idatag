@@ -86,7 +86,7 @@ Idatag_view::Idatag_view(QWidget* parent, Idatag_model* myModel, Idatag_configur
 
 	connect(this->tb, &QTableView::doubleClicked, this, &Idatag_view::OnNavigate);
 
-	this->wnd_filter_feeder = new QWidget();
+	this->wnd_filter_feeder = new QDialog();
 	this->feeder_filter_layout = new QGridLayout(wnd_filter_feeder);
 	this->feeder_layout = new QVBoxLayout();
 	wnd_filter_feeder->setWindowTitle("[IDATag] Filter by feeders...");

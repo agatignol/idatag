@@ -86,7 +86,7 @@ private:
 	QLabel*				funcl;
 	QLabel*				offsetl;
 
-	QWidget* wnd_filter_feeder;
+	QDialog* wnd_filter_feeder;
 	QGridLayout* feeder_filter_layout;
 	QVBoxLayout* feeder_layout;
 	QPushButton* btn_filter_feeder_ok;
