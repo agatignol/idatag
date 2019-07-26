@@ -302,7 +302,7 @@ void Idatag_view::OnFilter_empty()
 		this->cbox->setCheckState(Qt::Unchecked);
 		break;
 	default:
-		msg("[IDATAG] Error filter checkbox state\n");
+		msg("[IDATag] Error filter checkbox state\n");
 		this->cbox->setCheckState(Qt::Unchecked);
 	}
 	this->myProxy->invalidateFilter();
@@ -324,10 +324,18 @@ void Idatag_view::OnNavigate(const QModelIndex& index)
 void Idatag_view::OnNavigateTag(const uint64_t rva)
 {
 	QItemSelectionModel::SelectionFlags flags = QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows;
-	QModelIndex index = myModel->get_index_byrva(rva);
-	this->tb->setCurrentIndex(index);
-	this->tb->setFocus();
-	this->selectionModel->select(index, flags);
+	QModelIndex index_m = myModel->get_index_byrva(rva);
+	QModelIndex index_p = myProxy->mapFromSource(index_m);
+
+	if (index_p.isValid()) {
+		QModelIndex index_f = index_p.sibling(index_p.row() - 10, index_p.column());
+		this->tb->scrollTo(index_f);
+		this->tb->setFocus();
+		this->selectionModel->select(index_p.sibling(index_p.row() - 1, index_p.column()), flags);
+	}
+	else {
+		msg("\n[IDATag] Offset not referenced in IDATag!");
+	}
 }
 
 void Idatag_view::OnSearch()

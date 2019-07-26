@@ -190,7 +190,7 @@ Idatag_hook_ui::Idatag_hook_ui()
 
 	this->desc_disas_menu_sync = ACTION_DESC_LITERAL(
 		"idatag:context_menu_disas_sync",
-		"[IDATag] ~S~ynchronise",
+		"[IDATag] ~S~ynchronize",
 		&context_menu_disas_sync_ah,
 		NULL,
 		NULL, -1);
@@ -240,6 +240,10 @@ void evt_contextmenu_h(Idatag_hook_ui& myHook_UI, va_list args)
 			msg("\n[IDATag] Failed to attach contextual menu in IDA");
 		}
 		if (!attach_action_to_popup(f, p, "idatag:context_menu_disas_func"))
+		{
+			msg("\n[IDATag] Failed to attach contextual menu in IDA");
+		}
+		if (!attach_action_to_popup(f, p, "idatag:context_menu_disas_sync"))
 		{
 			msg("\n[IDATag] Failed to attach contextual menu in IDA");
 		}
