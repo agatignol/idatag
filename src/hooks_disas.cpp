@@ -323,6 +323,10 @@ Idatag_hook_cview::~Idatag_hook_cview()
 
 void evt_view_loc_changed_h(Idatag_hook_cview& myHook_CView, va_list args)
 {
+	TWidget* ida_widget = find_widget("IDATag");
+	if (ida_widget == NULL)
+		return;
+
 	TWidget* view = va_arg(args, TWidget*);
 	const lochist_entry_t* now = va_arg(args, const lochist_entry_t *);
 	const lochist_entry_t* was = va_arg(args, const lochist_entry_t *);
@@ -348,10 +352,8 @@ void evt_view_loc_changed_h(Idatag_hook_cview& myHook_CView, va_list args)
 				tags_func = offset_func->get_tags_tostr();
 			}
 		}
-
 		myView->set_tag_helper(tags_off, tags_func);
 	}
-
 }
 
 static ssize_t idaapi cview_evt_h(void* user_data, int notification_code, va_list args)
