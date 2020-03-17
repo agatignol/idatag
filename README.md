@@ -18,6 +18,7 @@ Tags can come from multiple sources such as IDA itself or different other client
 
 ## Releases
 
+* v0.4 -- SDK IDA 7.4, bug fix, assembly coloration
 * v0.3 -- Build on Linux, SDK IDA 7.3 , bug fix 
 * v0.2 -- Additional interactivity with IDATag from IDA
 * v0.1 -- Initial release
@@ -39,7 +40,7 @@ The plugin is in active development, some bugs may appear. Thanks to let me know
 #### Linux
 
 ```sh
-export IDASDK=/opt/idafree-7.0/idasdk73
+export IDASDK=/opt/idafree-7.0/idasdk74
 export IDATARGET=IDA32NUX
 mkdir Ida32Build
 cd Ida32Build
@@ -49,7 +50,7 @@ make
 #### Windows
 
 ```sh
-set IDASDK=C:\Program Files\IDA Pro 7.3\idasdk73
+set IDASDK=C:\Program Files\IDA Pro 7.4\idasdk74
 set IDATARGET=IDA32WIN
 "C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Auxiliary\Build\vcvars64.bat"
 mkdir Ida32Build
@@ -66,7 +67,7 @@ The build binary can be found in `bin\IDATag_x64\` directory:
 #### Linux
 
 ```sh
-export IDASDK=/opt/idafree-7.0/idasdk73
+export IDASDK=/opt/idafree-7.0/idasdk74
 export IDATARGET=IDA64NUX
 mkdir Ida64Build
 cd Ida64Build
@@ -76,7 +77,7 @@ make
 #### Windows
 
 ```sh
-set IDASDK=C:\Program Files\IDA Pro 7.3\idasdk73
+set IDASDK=C:\Program Files\IDA Pro 7.4\idasdk74
 set IDATARGET=IDA64WIN
 "C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Auxiliary\Build\vcvars64.bat"
 mkdir Ida64Build
@@ -88,7 +89,7 @@ cmake --build . --config RelWithDebInfo
 > WARNING: no quotes for the IDASDK path!
 > Example : 
 > ```sh
-> set IDASDK=C:\Program Files\IDA Pro 7.3\idasdk73
+> set IDASDK=C:\Program Files\IDA Pro 7.4\idasdk74
 > ```
 
 The build binary can be found in `bin\IDATag_x64\` directory:
@@ -106,6 +107,7 @@ Just copy the built dll file in the IDA Pro plugin directory.
 > ```
 
 > This plugin targets IDA Pro version 7.0 and above only.
+> This plugin has been tested with IDA Pro 7.4.
 > This plugin has not been tested on Linux.
 
 ## Usage
@@ -181,7 +183,8 @@ Right clicking the table in the Tag Overview will produce a context menu with a 
 * Filter by feeders (IDATag client)
 * Refresh tags from files
 * Reset filters
-* Paint offset (not implemented yet)
+* Paint offset 
+* Configure tag options (eg. coloured)
 
 Also, IDATag contextual menu is accessible from different views:
 * Functions view
