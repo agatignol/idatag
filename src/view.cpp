@@ -89,7 +89,7 @@ Idatag_view::Idatag_view(QWidget* parent, Idatag_model* myModel, Idatag_configur
 	this->wnd_filter_feeder = new QDialog();
 	this->feeder_filter_layout = new QGridLayout(wnd_filter_feeder);
 	this->feeder_layout = new QVBoxLayout();
-	wnd_filter_feeder->setWindowTitle("[IDATag] Filter by feeders...");
+	this->wnd_filter_feeder->setWindowTitle("[IDATag] Filter by feeders...");
 	this->btn_filter_feeder_ok = new QPushButton("OK");
 	this->btn_filter_feeder_cancel = new QPushButton("Cancel");
 
@@ -147,6 +147,10 @@ void Idatag_view::createActions()
 	this->paint_tag->setStatusTip(tr("Paint offsets in code"));
 	connect(this->paint_tag, &QAction::triggered, this, &Idatag_view::OnAction_paint_tag);
 
+	this->tag_options = new QAction(tr("&Tag options"), this);
+	this->tag_options->setStatusTip(tr("Configure tag options"));
+	connect(this->tag_options, &QAction::triggered, this, &Idatag_view::OnAction_tag_options);
+
 	this->reset_filter = new QAction(tr("&Reset filters"), this);;
 	this->reset_filter->setStatusTip(tr("Reset all filters"));
 	connect(this->reset_filter, &QAction::triggered, this, &Idatag_view::OnAction_reset_filter);
@@ -156,6 +160,7 @@ void Idatag_view::createActions()
 	this->contextual_menu->addAction(this->export_tag);
 	this->contextual_menu->addAction(this->import_tag);
 	this->contextual_menu->addAction(this->filter_feeder);
+	this->contextual_menu->addAction(this->tag_options);
 	this->contextual_menu->addAction(this->paint_tag);
 	this->contextual_menu->addAction(this->reset_filter);
 }
@@ -197,7 +202,45 @@ void Idatag_view::OnAction_filter_feeder()
 
 void Idatag_view::OnAction_paint_tag()
 {
-	msg("\n[IDATag] Paint not yet implemented.");
+	uint64 rva;
+	const auto& mydata = this->myModel->get_data();
+	
+	for (const auto& offset : mydata)
+	{
+		std::vector<Tag> tags;
+		tags = offset.get_tags();
+		rva = offset.get_rva();
+		for (const auto& tag : tags)
+		{
+			if (tag.get_coloured())
+			{
+				QColor colour = myConfiguration->get_palette()->get_feeder_colour(tag.get_signature());
+				colour_offset_bb(rva, colour);
+			}
+		}
+	}
+	return;
+}
+
+void Idatag_view::OnAction_tag_options()
+{ 
+	QModelIndexList indexes_p = this->selectionModel->selectedIndexes();
+
+	if (indexes_p.empty())
+	{
+		msg("\n[IDATag] No offset selected");
+		return;
+	}
+
+	QModelIndexList indexes_s;
+	for (const auto& index : indexes_p)
+	{
+		indexes_s.push_back(myProxy->mapToSource(index));
+	}
+
+	this->wnd_context_option = new Idatag_context_option(indexes_s);
+	if(this->wnd_context_option)
+		this->wnd_context_option->show();
 }
 
 void Idatag_view::OnAction_reset_filter()
@@ -702,7 +745,7 @@ Idatag_context_view::Idatag_context_view(QModelIndexList indexes)
 		this->lbl_rva = new QLabel(off_str);
 		this->lbl_name = new QLabel();
 	}
-
+	
 	this->menu_layout->addWidget(lbl_rva, 0, 0);
 	this->menu_layout->addWidget(lbl_name, 0, 1);
 
@@ -752,8 +795,151 @@ void Idatag_context_view::context_menu_add_tags()
 	this->close();
 }
 
-
 void Idatag_context_view::context_menu_pass()
+{
+	this->close();
+}
+
+uint64 Idatag_context_option::update_tag_options(std::vector<Offset*> offsets)
+{
+	uint64 count = 0;
+
+	if (this->option_menu_layout == NULL) return -1;
+
+	if (this->option_layout->count() > 0)
+	{
+		while (auto cbox = this->option_layout->takeAt(0))
+		{
+			delete cbox->widget();
+		}
+	}
+
+	std::vector<Tag> tags;
+	uint64 rva = BADADDR64;
+
+	for (const auto& offset : offset_selected)
+	{
+		rva = offset->get_rva();
+		this->tags = offset->get_tags();
+		for (auto& tag : this->tags)
+		{
+			count++;
+			QString qtag = QString::fromStdString(tag.get_label());
+			QString qfeeder = QString::fromStdString(tag.get_signature());
+			QString qsep = QString::fromStdString(" - ");
+		
+			char rva_str[20];
+			if (myConfiguration->get_address_width_configuration() == 16)
+			{
+				snprintf(rva_str, 19, "0x%016llX", (unsigned long long)offset->get_rva());
+			}
+			else
+			{
+				snprintf(rva_str, 19, "0x%08llX", (unsigned long long)offset->get_rva());
+			}
+
+			std::string str(rva_str);
+			QString qrva = QString::fromStdString(rva_str);
+			QCheckBox* cbox = new QCheckBox( qrva + qsep + qfeeder + qsep + qtag);
+
+			if (tag.get_coloured())
+			{
+				cbox->setCheckState(Qt::Checked);
+			}
+			else {
+				cbox->setCheckState(Qt::Unchecked);
+			}
+			this->option_layout->addWidget(cbox);
+		}
+	}
+	return count;
+}
+
+Idatag_context_option::Idatag_context_option(QModelIndexList indexes)
+{
+	std::vector<int> rows;
+	QModelIndex idx;
+
+	for (const auto& index : indexes)
+	{
+		if (std::find(rows.begin(), rows.end(), index.row()) == rows.end())
+		{
+			rows.push_back(index.row());
+		}
+	}
+
+	for (const auto& row : rows)
+	{
+		this->offset_selected.push_back(myModel->get_offset_byindex(row));
+	}
+
+	this->option_menu_layout = new QGridLayout(this);
+	this->option_layout = new QVBoxLayout();
+	this->setWindowTitle("[IDATag] Set colour option on tag");
+	this->btn_option_menu_ok = new QPushButton("OK");
+	this->btn_option_menu_cancel = new QPushButton("Cancel");
+	this->setAttribute(Qt::WA_DeleteOnClose);
+	this->setModal(true);
+	
+	uint64 count = this->update_tag_options(this->offset_selected);
+
+	this->option_menu_layout->addLayout(this->option_layout, 0, 0, 0);
+	this->option_menu_layout->addWidget(this->btn_option_menu_ok, count + 3, 0);
+	this->option_menu_layout->addWidget(this->btn_option_menu_cancel, count + 3, 1);
+
+	connect(this->btn_option_menu_ok, &QPushButton::clicked, this, &Idatag_context_option::context_menu_apply_option);
+	connect(this->btn_option_menu_cancel, &QPushButton::clicked, this, &Idatag_context_option::context_menu_pass);
+
+	this->sc_cancel = new QShortcut(Qt::Key_Escape, this);
+	this->connect(this->sc_cancel, &QShortcut::activated, this, &Idatag_context_option::context_menu_pass);
+
+	this->sc_ok = new QShortcut(Qt::Key_Enter, this);
+	this->connect(this->sc_ok, &QShortcut::activated, this, &Idatag_context_option::context_menu_apply_option);
+}
+
+void Idatag_context_option::apply_options(QString label, bool coloured)
+{
+	QStringList pieces = label.split(" - ");
+	QString qrva_label = pieces.value(0);
+
+	for (const auto& offset : this->offset_selected)
+	{
+		char rva_str[20];
+		if (myConfiguration->get_address_width_configuration() == 16)
+		{
+			snprintf(rva_str, 19, "0x%016llX", (unsigned long long)offset->get_rva());
+		}
+		else
+		{
+			snprintf(rva_str, 19, "0x%08llX", (unsigned long long)offset->get_rva());
+		}
+
+		std::string str(rva_str);
+		QString qrva = QString::fromStdString(rva_str);
+		
+		if (QString::compare(qrva, qrva_label, Qt::CaseInsensitive) == 0)
+		{
+			QString qtag_label = pieces.value(pieces.length() - 1);
+			QString qrva = QString::fromStdString(rva_str);
+			offset->apply_options_on_tag(qtag_label, coloured);
+		}
+	}
+}
+
+void Idatag_context_option::context_menu_apply_option()
+{
+	for (int i = 0; i < this->option_layout->count(); ++i)
+	{
+		QCheckBox* cbox = (QCheckBox*)this->option_layout->itemAt(i)->widget();
+		if (cbox != NULL)
+		{
+			this->apply_options(cbox->text(), cbox->checkState());
+		}
+	}
+	this->close();
+}
+
+void Idatag_context_option::context_menu_pass()
 {
 	this->close();
 }

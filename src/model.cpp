@@ -274,12 +274,26 @@ void Idatag_model::import_feed(const json& j_feed, Offset& offset)
 	uint64_t rva = j_feed["offset"];
 	std::string label = j_feed["tag"];
 	std::string feeder = j_feed["feeder"];
+	bool coloured;
+	std::string hash;
 
 	if (!check_rva(rva)) return;
 	if (offset.check_already_tagged(label)) return;
 
 	Tag tag = Tag(label, feeder);
-	
+
+	if ((j_feed.find("coloured") != j_feed.end()))
+	{
+		coloured = j_feed["coloured"];
+		tag.set_coloured(coloured);
+	}
+
+	if ((j_feed.find("hash") != j_feed.end()))
+	{
+		hash = j_feed["hash"];
+		tag.set_hash(hash);
+	}
+
 	offset.add_tag(tag);
 	add_feeder(feeder);
 }
@@ -396,7 +410,8 @@ void Idatag_model::export_tags() const
 			jsonTag["tag"] = tag.get_label();
 			jsonTag["feeder"] = tag.get_signature();
 			jsonTag["type"] = tag.get_type();
-			jsonTag["hash"] = tag.get_type();
+			jsonTag["hash"] = tag.get_hash();
+			jsonTag["coloured"] = tag.get_coloured();
 			jsonArray.push_back(jsonTag);
 		}
 	}
@@ -536,10 +551,25 @@ void Offset::set_name(std::string name)
 	this->name = name;
 }
 
-Tag::Tag(std::string& label, std::string& signature)
+void Offset::apply_options_on_tag(QString label_configured, bool coloured)
 {
-	this->label = label;
-	this->signature = signature;
+	auto& tags = this->get_tags();
+	for (auto tag : tags)
+	{
+		QString label = QString::fromStdString(tag.get_label());
+		if (QString::compare(label, label_configured, Qt::CaseInsensitive) == 0)
+		{
+			std::string new_label = tag.get_label();
+			std::string new_type = tag.get_type();
+			std::string new_signature = tag.get_signature();
+			std::string new_hash = tag.get_hash();
+			this->remove_tag(new_label);
+			Tag new_tag = Tag(new_label, new_type, new_signature, new_hash, coloured);
+			this->add_tag(new_tag);
+			break;
+		}
+	}
+	return;
 }
 
 Tag::Tag()
@@ -548,6 +578,16 @@ Tag::Tag()
 	this->type = "";
 	this->signature = "";
 	this->hash = "";
+	this->coloured = false;
+}
+
+Tag::Tag(std::string& label, std::string& signature)
+{
+	this->label = label;
+	this->signature = signature;
+	this->hash = "";
+	this->coloured = false;
+	this->type = "";
 }
 
 Tag::Tag(std::string& label, std::string& type, std::string& signature)
@@ -556,6 +596,7 @@ Tag::Tag(std::string& label, std::string& type, std::string& signature)
 	this->type = type;
 	this->signature = signature;
 	this->hash = "";
+	this->coloured = false;
 }
 
 Tag::Tag(std::string& label, std::string& type, std::string& signature, std::string& hash)
@@ -563,6 +604,26 @@ Tag::Tag(std::string& label, std::string& type, std::string& signature, std::str
 	this->label = label;
 	this->type = type;
 	this->signature = signature;
+	this->hash = hash;
+	this->coloured = false;
+}
+
+Tag::Tag(std::string& label, std::string& type, std::string& signature, std::string& hash, bool coloured)
+{
+	this->label = label;
+	this->type = type;
+	this->signature = signature;
+	this->hash = hash;
+	this->coloured = coloured;
+}
+
+void Tag::set_coloured(bool coloured)
+{
+	this->coloured = coloured;
+}
+
+void Tag::set_hash(std::string hash)
+{
 	this->hash = hash;
 }
 
@@ -579,4 +640,14 @@ const std::string Tag::get_type() const
 const std::string Tag::get_signature() const 
 {
 	return this->signature;
+}
+
+const std::string Tag::get_hash() const
+{
+	return this->hash;
+}
+
+const bool Tag::get_coloured() const
+{
+	return this->coloured;
 }

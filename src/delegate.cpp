@@ -79,8 +79,9 @@ Idatag_delegate_tag::Idatag_delegate_tag(QWidget* parent, Idatag_model* myModel,
 {
 	this->parent = parent;
 	this->myModel = myModel;
-	this->myPalette = new Idatag_palette(this->myModel->get_feeders());
 	this->myConfiguration = myConfiguration;
+	this->myConfiguration->set_palette(new Idatag_palette(this->myModel->get_feeders()));
+
 	this->myProxy = myProxy;
 }
 
@@ -117,7 +118,7 @@ void Idatag_delegate_tag::drawTag(Tag tag, QPainter *painter, const QStyleOption
 	QString qlabel = QString::fromStdString(tag.get_label());
 	QPainterPath path = QPainterPath();
 	path.addRoundedRect(QRectF(option.rect.x(), option.rect.y() + 2, width + 20, height), 10, 10);
-	painter->fillPath(path, this->myPalette->get_feeder_colour(tag.get_signature()));
+	painter->fillPath(path, myConfiguration->get_palette()->get_feeder_colour(tag.get_signature()));
 
 	painter->drawText(path.controlPointRect(), Qt::AlignHCenter | Qt::AlignVCenter, qlabel);
 	painter->setPen(Qt::NoPen);
@@ -133,7 +134,7 @@ void Idatag_delegate_tag::paint(QPainter *painter, const QStyleOptionViewItem& o
 {
 	if (!index.isValid()) return;
 
-	this->myPalette->refresh_feeders(this->myModel->get_feeders());
+	myConfiguration->get_palette()->refresh_feeders(this->myModel->get_feeders());
 
 	Offset* offset = index.data().value<Offset*>();
 	if (offset != NULL) {

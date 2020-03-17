@@ -16,7 +16,8 @@ Idatag_configuration::Idatag_configuration()
 {
 	this->username = std::string("User");
 	this->base = get_imagebase();
-	
+	this->myPalette = nullptr;
+
 	if (inf_is_64bit()) {
 		this->address_width = 16;
 	}
@@ -25,6 +26,17 @@ Idatag_configuration::Idatag_configuration()
 	install_menu_configuration();
 	create_menu_configuration();
 }
+
+void Idatag_configuration::set_palette(Idatag_palette* palette)
+{
+	this->myPalette = palette;
+}
+
+Idatag_palette* Idatag_configuration::get_palette()
+{
+	return this->myPalette;
+}
+
 
 void Idatag_configuration::install_menu_configuration()
 {

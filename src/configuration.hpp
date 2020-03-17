@@ -15,6 +15,8 @@
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QDialog>
 
+#include "palette.hpp"
+
 namespace fs = std::filesystem;
 
 struct show_menu_configuration_ah_t : public action_handler_t
@@ -40,6 +42,8 @@ private:
 	QPushButton* menu_button_ok;
 	QPushButton* menu_button_cancel;
 	QGridLayout* layout;
+
+	Idatag_palette* myPalette;
 
 	show_menu_configuration_ah_t show_menu_configuration_ah;
 
@@ -72,6 +76,9 @@ public:
 
 	void set_filename_configuration(const char* filename);
 	std::string get_filename_configuration();
+
+	void set_palette(Idatag_palette*);
+	Idatag_palette* get_palette();
 };
 
 extern Idatag_configuration* myConfiguration;

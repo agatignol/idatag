@@ -21,6 +21,8 @@
 #include "proxy.hpp"
 #include "configuration.hpp"
 #include "delegate.hpp"
+#include "hooks_disas.hpp"
+#include "palette.hpp"
 
 class Idatag_table : public QTableView {
 	Q_OBJECT
@@ -55,6 +57,8 @@ private:
 	QLabel* lbl_selection;
 	QLabel* lbl_name;
 
+	// FIXME cbox
+
 	QShortcut* sc_ok;
 	QShortcut* sc_cancel;
 
@@ -62,6 +66,29 @@ public:
 	Idatag_context_view(QModelIndexList);
 	void context_menu_add_tags();
 	void context_menu_pass();
+};
+
+class Idatag_context_option : public QDialog {
+	Q_OBJECT
+private:
+	std::vector<Offset*> offset_selected;
+	std::vector<Tag> tags;
+
+	QGridLayout* option_menu_layout;
+	QVBoxLayout* option_layout;
+	QPushButton* btn_option_menu_ok;
+	QPushButton* btn_option_menu_cancel;
+
+	QShortcut* sc_ok;
+	QShortcut* sc_cancel;
+
+public:
+	Idatag_context_option(QModelIndexList);
+	void context_menu_apply_option();
+	void context_menu_pass();
+
+	void apply_options(QString, bool);
+	uint64 update_tag_options(std::vector<Offset*>);
 };
 
 class Idatag_view : public QWidget{
@@ -93,6 +120,7 @@ private:
 	QPushButton* btn_filter_feeder_cancel;
 
 	Idatag_context_view* wnd_context_view;
+	Idatag_context_option* wnd_context_option;
 
 	QMenu* contextual_menu;
 	QAction* add_tag;
@@ -100,6 +128,7 @@ private:
 	QAction* import_tag;
 	QAction* filter_feeder;
 	QAction* paint_tag;
+	QAction* tag_options;
 	QAction* reset_filter;
 
 public:
@@ -124,6 +153,7 @@ public:
 	void OnAction_import_tag();
 	void OnAction_filter_feeder();
 	void OnAction_paint_tag();
+	void OnAction_tag_options();
 	void OnAction_reset_filter();
 
 	void set_tag_helper(std::string, std::string);

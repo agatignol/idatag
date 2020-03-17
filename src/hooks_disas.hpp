@@ -5,6 +5,8 @@
 #include <loader.hpp>
 #include <kernwin.hpp>
 #include <moves.hpp>
+#include <nalt.hpp>
+#include <pro.h>
 
 #include "model.hpp"
 #include "view.hpp"
@@ -96,6 +98,7 @@ public:
 static ssize_t idaapi  cview_evt_h(void*, int, va_list);
 void evt_view_loc_changed_h(Idatag_hook_cview&, va_list);
 
+void colour_offset_bb(uint64, QColor);
 
 extern Idatag_hook_idb* myHook_IDB;
 extern Idatag_hook_ui* myHook_UI;

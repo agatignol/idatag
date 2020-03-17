@@ -30,14 +30,20 @@ private:
 	std::string					label;
 	std::string					type;
 	std::string					signature;
+	bool						coloured;
 public:
 	Tag();
-	Tag(std::string&, std::string&);
-	Tag(std::string&, std::string&, std::string&);
-	Tag(std::string&, std::string&, std::string&, std::string&);
+	Tag(std::string& label, std::string& signature);
+	Tag(std::string& label, std::string& type, std::string& signature);
+	Tag(std::string& label, std::string& type, std::string& signature, std::string& hash);
+	Tag(std::string& label, std::string& type, std::string& signature, std::string& hash, bool coloured);
 	const std::string get_label() const;
 	const std::string get_type() const;
 	const std::string get_signature() const;
+	const std::string get_hash() const;
+	const bool get_coloured() const;
+	void set_coloured(bool);
+	void set_hash(std::string);
 };
 
 class Offset : public QObject{
@@ -61,6 +67,9 @@ public:
 
 	void add_tag(Tag&);
 	const std::vector<Tag> get_tags() const;
+	
+	void apply_options_on_tag(QString, bool);
+
 	const std::string get_tags_tostr() const;
 	void remove_tag(std::string&);
 	void remove_all_tags();

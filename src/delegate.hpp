@@ -46,7 +46,6 @@ class Idatag_delegate_tag : public QStyledItemDelegate
 
 private:
 	Idatag_model* myModel;
-	Idatag_palette* myPalette;
 	Idatag_proxy* myProxy;
 	QWidget* parent;
 	Idatag_configuration* myConfiguration;

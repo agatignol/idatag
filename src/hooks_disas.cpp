@@ -367,3 +367,10 @@ static ssize_t idaapi cview_evt_h(void* user_data, int notification_code, va_lis
 	}
 	return 0;
 }
+
+void colour_offset_bb(uint64 rva, QColor colour)
+{
+	set_item_color(rva, colour.rgb());
+	msg("\n[IDATag] Not yet implemented");
+	return;
+}
