@@ -158,6 +158,7 @@ public:
 	void OnAction_reset_filter();
 
 	void set_tag_helper(std::string, std::string);
+	Idatag_proxy* get_proxy();
 };
 
 extern Idatag_view* myView;
@@ -165,6 +166,7 @@ extern Idatag_view* myView;
 class Idatag_context_disas : public QDialog {
 	Q_OBJECT
 private:
+	Idatag_proxy* myProxy;
 	action_activation_ctx_t* ctx;
 	QGridLayout* menu_layout;
 	QPushButton* btn_menu_ok;
@@ -179,7 +181,7 @@ private:
 	QShortcut* sc_cancel;
 
 public:
-	Idatag_context_disas(action_activation_ctx_t*);
+	Idatag_context_disas(action_activation_ctx_t*, Idatag_proxy*);
 
 	void context_menu_add_tags();
 	void context_menu_pass();
@@ -188,6 +190,7 @@ public:
 class Idatag_context_disas_func : public QDialog {
 	Q_OBJECT
 private:
+	Idatag_proxy* myProxy;
 	action_activation_ctx_t* ctx;
 	QGridLayout* menu_layout;
 	QPushButton* btn_menu_ok;
@@ -202,7 +205,7 @@ private:
 	QShortcut* sc_cancel;
 
 public:
-	Idatag_context_disas_func(action_activation_ctx_t*);
+	Idatag_context_disas_func(action_activation_ctx_t*, Idatag_proxy*);
 
 	void context_menu_add_tags();
 	void context_menu_pass();
@@ -211,6 +214,7 @@ public:
 class Idatag_context_func : public QDialog {
 	Q_OBJECT
 private:
+	Idatag_proxy* myProxy;
 	action_activation_ctx_t* ctx;
 	QGridLayout* menu_layout;
 	QPushButton* btn_menu_ok;
@@ -225,7 +229,7 @@ private:
 	QShortcut* sc_cancel;
 
 public:
-	Idatag_context_func(action_activation_ctx_t*);
+	Idatag_context_func(action_activation_ctx_t*, Idatag_proxy*);
 
 	void context_menu_add_tags();
 	void context_menu_pass();
@@ -234,6 +238,7 @@ public:
 class Idatag_context_name : public QDialog {
 	Q_OBJECT
 private:
+	Idatag_proxy* myProxy;
 	action_activation_ctx_t* ctx;
 	QGridLayout* menu_layout;
 	QPushButton* btn_menu_ok;
@@ -248,7 +253,7 @@ private:
 	QShortcut* sc_cancel;
 
 public:
-	Idatag_context_name(action_activation_ctx_t*);
+	Idatag_context_name(action_activation_ctx_t*, Idatag_proxy*);
 
 	void context_menu_add_tags();
 	void context_menu_pass();

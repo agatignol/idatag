@@ -438,6 +438,7 @@ void Idatag_context_disas::context_menu_add_tags()
 			myModel->add_feeder(autofeed);
 		}
 	}
+	this->myProxy->refresh_filters();
 	this->close();
 }
 
@@ -446,9 +447,10 @@ void Idatag_context_disas::context_menu_pass()
 	this->close();
 }
 
-Idatag_context_disas::Idatag_context_disas(action_activation_ctx_t* ctx)
+Idatag_context_disas::Idatag_context_disas(action_activation_ctx_t* ctx, Idatag_proxy* myProxy)
 {
 	this->ctx = ctx;
+	this->myProxy = myProxy;
 	this->setAttribute(Qt::WA_DeleteOnClose);
 	this->menu_layout = new QGridLayout(this);
 	this->setWindowTitle("[IDATag] Add tags...");
@@ -536,6 +538,7 @@ void Idatag_context_name::context_menu_add_tags()
 
 		}
 	}
+	this->myProxy->refresh_filters();
 	this->close();
 }
 
@@ -544,9 +547,10 @@ void Idatag_context_name::context_menu_pass()
 	this->close();
 }
 
-Idatag_context_name::Idatag_context_name(action_activation_ctx_t* ctx)
+Idatag_context_name::Idatag_context_name(action_activation_ctx_t* ctx, Idatag_proxy* myProxy)
 {
 	this->ctx = ctx;
+	this->myProxy = myProxy;
 	this->setAttribute(Qt::WA_DeleteOnClose);
 	this->menu_layout = new QGridLayout(this);
 	this->setWindowTitle("[IDATag] Add tags...");
@@ -641,6 +645,7 @@ void Idatag_context_func::context_menu_add_tags()
 
 		}
 	}
+	this->myProxy->refresh_filters();
 	this->close();
 }
 
@@ -649,9 +654,10 @@ void Idatag_context_func::context_menu_pass()
 	this->close();
 }
 
-Idatag_context_func::Idatag_context_func(action_activation_ctx_t* ctx)
+Idatag_context_func::Idatag_context_func(action_activation_ctx_t* ctx, Idatag_proxy* myProxy)
 {
 	this->ctx = ctx;
+	this->myProxy = myProxy;
 	this->setAttribute(Qt::WA_DeleteOnClose);
 	this->menu_layout = new QGridLayout(this);
 	this->setWindowTitle("[IDATag] Add tags...");
@@ -988,6 +994,7 @@ void Idatag_context_disas_func::context_menu_add_tags()
 			myModel->add_feeder(autofeed);
 		}
 	}
+	this->myProxy->refresh_filters();
 	this->close();
 }
 
@@ -996,9 +1003,10 @@ void Idatag_context_disas_func::context_menu_pass()
 	this->close();
 }
 
-Idatag_context_disas_func::Idatag_context_disas_func(action_activation_ctx_t* ctx)
+Idatag_context_disas_func::Idatag_context_disas_func(action_activation_ctx_t* ctx, Idatag_proxy* myProxy)
 {
 	this->ctx = ctx;
+	this->myProxy = myProxy;
 	this->setAttribute(Qt::WA_DeleteOnClose);
 	this->menu_layout = new QGridLayout(this);
 	this->setWindowTitle("[IDATag] Add tags on function...");
@@ -1047,4 +1055,9 @@ Idatag_context_disas_func::Idatag_context_disas_func(action_activation_ctx_t* ct
 
 	this->sc_ok = new QShortcut(Qt::Key_Return, this);
 	this->connect(this->sc_ok, &QShortcut::activated, this, &Idatag_context_disas_func::context_menu_add_tags);
+}
+
+Idatag_proxy* Idatag_view::get_proxy()
+{
+	return this->myProxy;
 }

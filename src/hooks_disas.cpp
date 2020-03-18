@@ -95,7 +95,7 @@ static ssize_t idaapi idb_evt_h(void* user_data, int notification_code, va_list 
 
 int idaapi show_context_menu_disas_ah_t::activate(action_activation_ctx_t *ctx)
 {
-	Idatag_context_disas* context_menu = new Idatag_context_disas(ctx);
+	Idatag_context_disas* context_menu = new Idatag_context_disas(ctx, myView->get_proxy());
 	if (ctx->cur_ea == BADADDR) return 0;
 	
 	context_menu->show();
@@ -109,7 +109,7 @@ action_state_t idaapi show_context_menu_disas_ah_t::update(action_update_ctx_t *
 
 int idaapi show_context_menu_disas_func_ah_t::activate(action_activation_ctx_t *ctx)
 {
-	Idatag_context_disas_func* context_menu = new Idatag_context_disas_func(ctx);
+	Idatag_context_disas_func* context_menu = new Idatag_context_disas_func(ctx, myView->get_proxy());
 	if (myModel->is_in_func(ctx->cur_ea) != BADADDR)
 	{
 		context_menu->show();
@@ -127,7 +127,7 @@ action_state_t idaapi show_context_menu_disas_func_ah_t::update(action_update_ct
 
 int idaapi show_context_menu_func_ah_t::activate(action_activation_ctx_t *ctx)
 {
-	Idatag_context_func* context_menu = new Idatag_context_func(ctx);
+	Idatag_context_func* context_menu = new Idatag_context_func(ctx, myView->get_proxy());
 	context_menu->show();
 	return 0;
 }
@@ -139,7 +139,7 @@ action_state_t idaapi show_context_menu_func_ah_t::update(action_update_ctx_t *)
 
 int idaapi show_context_menu_name_ah_t::activate(action_activation_ctx_t *ctx)
 {
-	Idatag_context_name* context_menu = new Idatag_context_name(ctx);
+	Idatag_context_name* context_menu = new Idatag_context_name(ctx, myView->get_proxy());
 	context_menu->show();
 	return 0;
 }
