@@ -342,7 +342,8 @@ void Idatag_model::import_feeds(json& j_feeds)
 		}
 	}
 	catch (json::exception& e) {
-		msg("\n[IDATag] Error parsing file - %s", e.what());
+		msg("\n[IDATag] Error parsing json - %s", e.what());
+		return;
 	}
 }
 
@@ -356,6 +357,10 @@ void Idatag_model::import_file(const fs::path& filepath)
 	}
 	catch(std::ifstream::failure e){
 		msg("\n[IDATag] Error reading file - %s", e.what());
+		return;
+	}
+	catch (json::exception & e) {
+		msg("\n[IDATag] Error parsing json - %s", e.what());
 	}
 }
 
@@ -370,6 +375,7 @@ void Idatag_model::import_files(const fs::path& path_tags)
 	catch(fs::filesystem_error& e)
 	{
 		msg("\n[IDATag] Error finding tag directory - %s", e.what());
+		return;
 	}
 }
 
@@ -389,6 +395,7 @@ void Idatag_model::import_tags()
 	catch (fs::filesystem_error& e)
 	{
 		msg("\n[IDATag] Error reading directory - %s", e.what());
+		return;
 	}
 }
 
@@ -442,6 +449,7 @@ void Idatag_model::export_tags() const
 	catch (fs::filesystem_error& e)
 	{
 		msg("\n[IDATag] Error exporting tags - %s", e.what());
+		return;
 	}
 }
 
