@@ -30,18 +30,28 @@ bool Idatag_proxy::filter_string(int source_row, const QModelIndex& source_paren
 	if (offset == NULL) return false;
 
 	std::string str_filter = filter_string_input.toStdString();
-	
-	if (offset->get_name().find(str_filter) != std::string::npos) return true;
+	transform(str_filter.begin(), str_filter.end(), str_filter.begin(), ::tolower);
+
+	std::string name = offset->get_name();
+	transform(name.begin(), name.end(), name.begin(), ::tolower);
+
+	if (name.find(str_filter) != std::string::npos) return true;
 
 	char rva_c[20];
 	snprintf(rva_c, 19, "0x%016llX", (unsigned long long)offset->get_rva());
 	std::string rva_str(rva_c);
+	transform(rva_str.begin(), rva_str.end(), rva_str.begin(), ::tolower);
+
 	if (rva_str.find(str_filter) != std::string::npos) return true;
 
 	std::vector<Tag> tags = offset->get_tags();
+	std::string label;
+
 	for (const auto & tag : tags)
 	{
-		if (tag.get_label().find(str_filter) != std::string::npos) {
+		label = tag.get_label();
+		transform(label.begin(), label.end(), label.begin(), ::tolower);
+		if (label.find(str_filter) != std::string::npos) {
 			return true;
 		}
 	}
@@ -107,11 +117,6 @@ void Idatag_proxy::set_filter_feeder(std::vector<std::string> feeders)
 	this->filter_feeder_input = feeders;
 }
 
-std::vector<std::string> Idatag_proxy::get_filter_feeder()
-{
-	return this->filter_feeder_input;
-}
-
 void Idatag_proxy::reset_filters()
 {
 	this->set_filter_empty(Qt::Unchecked);
@@ -136,4 +141,35 @@ bool Idatag_proxy::is_label_filtered(std::string label)
 	if (label.find(str_filter) != std::string::npos) return true;
 	
 	return false;
+}
+
+int Idatag_proxy::get_filter_empty()
+{
+	return this->filter_empty_input;
+}
+
+QString Idatag_proxy::get_filter_string()
+{
+	return this->filter_string_input;
+}
+
+std::vector<std::string> Idatag_proxy::get_filter_feeder()
+{
+	return this->filter_feeder_input;
+}
+
+void Idatag_proxy::refresh_filters()
+{
+	int empty_back = this->get_filter_empty();
+	QString string_back = this->get_filter_string();
+	std::vector<std::string> feeder_back = this->get_filter_feeder();
+
+	this->reset_filters();
+	this->invalidateFilter();
+	
+	this->set_filter_empty((QT::Qt::CheckState)empty_back);
+	this->set_filter_string(string_back);
+	this->set_filter_feeder(feeder_back);
+
+	this->invalidateFilter();
 }

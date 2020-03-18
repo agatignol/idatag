@@ -14,10 +14,14 @@ public:
 	void set_filter_empty(Qt::CheckState);
 	void set_filter_string(QString);
 	void set_filter_feeder(std::vector<std::string>);
-	std::vector<std::string> get_filter_feeder();
 	bool is_feeder_filtered(std::string);
 	bool is_label_filtered(std::string);
 	void reset_filters();
+	void refresh_filters();
+
+	int get_filter_empty();
+	QString get_filter_string();
+	std::vector<std::string> get_filter_feeder();
 
 	friend class Idatag_view;
 

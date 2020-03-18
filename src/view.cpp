@@ -99,6 +99,8 @@ Idatag_view::Idatag_view(QWidget* parent, Idatag_model* myModel, Idatag_configur
 
 	connect(this->btn_filter_feeder_ok, &QPushButton::clicked, this, &Idatag_view::OnFilter_feeder);
 	connect(this->btn_filter_feeder_cancel, &QPushButton::clicked, this, &Idatag_view::OnFilter_feeder_pass);
+
+	this->paint_state = false;
 }
 
 void Idatag_table::keyPressEvent(QKeyEvent *event)
@@ -143,8 +145,8 @@ void Idatag_view::createActions()
 	this->filter_feeder->setStatusTip(tr("Filter tags by signature"));
 	connect(this->filter_feeder, &QAction::triggered, this, &Idatag_view::OnAction_filter_feeder);
 
-	this->paint_tag = new QAction(tr("&Paint offsets"), this);
-	this->paint_tag->setStatusTip(tr("Paint offsets in code"));
+	this->paint_tag = new QAction(tr("&Paint/Unpaint offsets"), this);
+	this->paint_tag->setStatusTip(tr("Paint/Unpaint offsets in code"));
 	connect(this->paint_tag, &QAction::triggered, this, &Idatag_view::OnAction_paint_tag);
 
 	this->tag_options = new QAction(tr("&Tag options"), this);
@@ -180,7 +182,7 @@ void Idatag_view::OnAction_add_tag()
 		indexes_s.push_back(myProxy->mapToSource(index));
 	}
 
-	this->wnd_context_view = new Idatag_context_view(indexes_s);
+	this->wnd_context_view = new Idatag_context_view(indexes_s, this->myProxy);
 	this->wnd_context_view->show();
 }
 
@@ -204,14 +206,22 @@ void Idatag_view::OnAction_paint_tag()
 {
 	uint64 rva;
 	const auto& mydata = this->myModel->get_data();
-	
 	for (const auto& offset : mydata)
 	{
 		std::vector<Tag> tags;
 		tags = offset.get_tags();
 		rva = offset.get_rva();
-		for (const auto& tag : tags)
+		for (const auto& tag : tags) 
 		{
+			if (this->paint_state)
+			{
+				uncolour_offset_bb(rva);
+				this->paint_state = false;
+				continue;
+			}
+
+			this->paint_state = true;
+
 			if (tag.get_coloured())
 			{
 				QColor colour = myConfiguration->get_palette()->get_feeder_colour(tag.get_signature());
@@ -247,8 +257,8 @@ void Idatag_view::OnAction_reset_filter()
 {
 	this->tf->setText("");
 	this->cbox->setCheckState(Qt::Unchecked);
-	myProxy->reset_filters();
-	myProxy->invalidateFilter();
+	this->myProxy->reset_filters();
+	this->myProxy->invalidateFilter();
 }
 
 Idatag_view::~Idatag_view() 
@@ -700,8 +710,9 @@ Idatag_context_func::Idatag_context_func(action_activation_ctx_t* ctx)
 	this->connect(this->sc_ok, &QShortcut::activated, this, &Idatag_context_func::context_menu_add_tags);
 }
 
-Idatag_context_view::Idatag_context_view(QModelIndexList indexes)
+Idatag_context_view::Idatag_context_view(QModelIndexList indexes, Idatag_proxy* myProxy)
 {
+	this->myProxy = myProxy;
 	this->setAttribute(Qt::WA_DeleteOnClose);
 	this->menu_layout = new QGridLayout(this);
 	this->setWindowTitle("[IDATag] Add tags...");
@@ -792,6 +803,7 @@ void Idatag_context_view::context_menu_add_tags()
 			}
 		}
 	}
+	this->myProxy->refresh_filters();
 	this->close();
 }
 

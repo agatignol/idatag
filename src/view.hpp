@@ -48,6 +48,7 @@ public:
 class Idatag_context_view : public QDialog {
 	Q_OBJECT
 private:
+	Idatag_proxy* myProxy;
 	QGridLayout* menu_layout;
 	QPushButton* btn_menu_ok;
 	QPushButton* btn_menu_cancel;
@@ -57,13 +58,11 @@ private:
 	QLabel* lbl_selection;
 	QLabel* lbl_name;
 
-	// FIXME cbox
-
 	QShortcut* sc_ok;
 	QShortcut* sc_cancel;
 
 public:
-	Idatag_context_view(QModelIndexList);
+	Idatag_context_view(QModelIndexList, Idatag_proxy*);
 	void context_menu_add_tags();
 	void context_menu_pass();
 };
@@ -130,6 +129,8 @@ private:
 	QAction* paint_tag;
 	QAction* tag_options;
 	QAction* reset_filter;
+
+	bool paint_state;
 
 public:
 	Idatag_view(QWidget*, Idatag_model*, Idatag_configuration*);

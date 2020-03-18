@@ -99,6 +99,7 @@ static ssize_t idaapi  cview_evt_h(void*, int, va_list);
 void evt_view_loc_changed_h(Idatag_hook_cview&, va_list);
 
 void colour_offset_bb(uint64, QColor);
+void uncolour_offset_bb(uint64);
 
 extern Idatag_hook_idb* myHook_IDB;
 extern Idatag_hook_ui* myHook_UI;
